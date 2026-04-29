@@ -1,52 +1,70 @@
-# ⚙️ Cloud Resume Challenge - Backend
-https://github.com/jamesadewara/cloud-resume-challenge-backend.git
+# ⚙️ Cloud Resume Challenge - Serverless Backend
 
-This directory contains the serverless backend for the Cloud Resume Challenge, built with **Python** and **FastAPI**.
+A high-performance, serverless API built with **Python 3.12** and **FastAPI**, designed to run on **AWS Lambda** via **Mangum**. This backend manages the visitor counter and provides real-time analytics for the resume website.
 
-## 🚀 Features
+## 🚀 Key Features
 
-- **Serverless API**: Designed to run on AWS Lambda.
-- **Visitor Counter**: Real-time tracking of unique resume views.
-- **Database Integration**: Seamless connection with MongoDB Atlas.
-- **Automated CI/CD**: GitHub Actions workflow for deployment.
+- **Serverless Architecture**: Fully event-driven deployment using AWS Lambda and Amazon API Gateway.
+- **FastAPI Framework**: Leveraging Pydantic v2 for high-speed data validation and auto-generated documentation.
+- **MongoDB Atlas Integration**: Persistent storage using the **Beanie ODM** for asynchronous database operations.
+- **Automated CI/CD**: Integrated testing with `pytest` and automated deployment via GitHub Actions (OIDC).
+- **CORS Hardening**: Secure cross-origin resource sharing configured for production domains.
+
+## 📐 API Endpoints
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/health` | System health check and DB connectivity status. |
+| `POST` | `/api/visit` | Records a new visitor and returns the updated count. |
+| `GET` | `/api/redoc` | Interactive API documentation (ReDoc). |
 
 ## 🛠️ Local Development
 
 ### 1. Prerequisites
-- Python 3.9+
-- MongoDB Atlas account (or local MongoDB)
+- Python 3.12
+- MongoDB Atlas cluster (or local MongoDB instance)
 
-### 2. Setup Environment
+### 2. Installation
 ```bash
+# Create and activate virtual environment
 python -m venv venv
-# Windows
-.\venv\Scripts\activate
-# Linux/macOS
-source venv/bin/activate
+source venv/bin/activate  # On Windows: .\venv\Scripts\activate
 
+# Install dependencies
 pip install -r requirements.txt
 ```
 
 ### 3. Configuration
-Create a `.env` file in this directory:
+Create a `.env` file in the root directory:
 ```env
-MONGODB_URI=your_mongodb_connection_string
-DATABASE_NAME=resume_db
+MONGODB_URL=mongodb+srv://user:pass@cluster.mongodb.net/resume_db
+DB_NAME=resume_db
+ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
 ```
 
-### 4. Run Locally
+### 4. Running the Server
 ```bash
-# Run the FastAPI server
 uvicorn app.main:app --reload
 ```
-The API will be available at `http://localhost:8000`. You can view the interactive documentation at `http://localhost:8000/docs`.
+The API will be available at `http://localhost:8000`.
 
-## 📂 Structure
+## 🧪 Testing
+We use `pytest` with `pytest-asyncio` for unit and integration testing.
+```bash
+# Run all tests
+export PYTHONPATH=$PYTHONPATH:$(pwd)
+pytest tests/ -v
+```
 
-- `app/main.py`: Entry point for the FastAPI application.
-- `app/api/`: API route definitions.
-- `app/models/`: Database models and schemas.
-- `app/db/`: Database connection logic.
+## 📦 Deployment package structure
+For AWS Lambda, the CI/CD pipeline packages the dependencies and the `app/` directory into a single zip file:
+```text
+lambda_package.zip
+├── app/
+│   ├── main.py (Handler: app.main.handler)
+│   └── ...
+└── (installed dependencies)
+```
 
-## 🚀 Deployment
-Deployments are handled automatically via GitHub Actions when pushing to the `main` branch.
+---
+*Maintained by James Adewara*

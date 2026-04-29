@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.db.database import lifespan
 from app.api.routers import health, visits
+from mangum import Mangum
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -37,6 +38,8 @@ async def redoc_html():
 
 app.include_router(health.router)
 app.include_router(visits.router)
+
+handler = Mangum(app)
 
 if __name__ == "__main__":
     import uvicorn
