@@ -68,7 +68,7 @@ jobs:
           pip install -r requirements.txt -t package --quiet
           cp -r app package/
           cd package
-          zip -r ../lambda_package.zip . -x "*.pyc" -x "__pycache__/*" -x "*.dist-info/*" -x "*.egg-info/*"
+          zip -r ../lambda_package.zip . -x "*.pyc" -x "__pycache__/*"
           cd ..
           echo "Package size: $(du -h lambda_package.zip | cut -f1)"
 
