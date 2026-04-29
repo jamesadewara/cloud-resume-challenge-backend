@@ -67,6 +67,12 @@ jobs:
           mkdir -p package
           pip install -r requirements.txt -t package --quiet
           cp -r app package/
+          
+          # Create .env file from GitHub Secrets/Vars
+          echo "MONGODB_URL=${{ secrets.MONGODB_URL }}" > package/app/.env
+          echo "DB_NAME=${{ vars.DB_NAME }}" >> package/app/.env
+          echo "ALLOWED_ORIGINS=${{ secrets.ALLOWED_ORIGINS }}" >> package/app/.env
+          
           cd package
           zip -r ../lambda_package.zip . -x "*.pyc" -x "__pycache__/*"
           cd ..
