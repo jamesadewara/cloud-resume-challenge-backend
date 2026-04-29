@@ -6,14 +6,14 @@ from app.models.visitor import (
 
 router = APIRouter(tags=["Visitors"])
 
-@router.get("/api/visits", response_model=CountResponse)
+@router.get("/visits", response_model=CountResponse)
 async def get_visits():
     doc = await Visitor.find_one()
     if not doc:
         return CountResponse(count=0)
     return CountResponse(count=doc.count, last_updated=doc.updated_at)
 
-@router.post("/api/visit", response_model=VisitResponse)
+@router.post("/visit", response_model=VisitResponse)
 async def record_visit(request: Request, body: VisitRequest):
     ip = request.headers.get("x-forwarded-for") or (request.client.host if request.client else None)
     
@@ -51,7 +51,7 @@ async def record_visit(request: Request, body: VisitRequest):
 
     return VisitResponse(count=doc.count)
 
-@router.get("/api/visits/details", response_model=DetailsResponse)
+@router.get("/visits/details", response_model=DetailsResponse)
 async def get_visit_details():
     doc = await Visitor.find_one()
     if not doc:

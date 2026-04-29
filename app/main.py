@@ -6,10 +6,13 @@ from app.db.database import lifespan
 from app.api.routers import health, visits
 from mangum import Mangum
 
+import os
+
 app = FastAPI(
     title=settings.APP_NAME,
     lifespan=lifespan,
     redoc_url=None,
+    root_path="/prod" if os.getenv("AWS_EXECUTION_ENV") else ""
 )
 
 app.add_middleware(
@@ -36,8 +39,8 @@ async def redoc_html():
 </html>
 """)
 
-app.include_router(health.router)
-app.include_router(visits.router)
+app.include_router(health.router, prefix="/api")
+app.include_router(visits.router, prefix="/api")
 
 handler = Mangum(app)
 
