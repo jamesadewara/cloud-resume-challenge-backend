@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, staging]
     paths:
-      - "src/**"
+      - "app/**"
       - "tests/**"
       - "requirements.txt"
       - ".github/workflows/deploy.yml"
@@ -16,9 +16,9 @@ permissions:
   contents: read
 
 env:
-  AWS_REGION: us-east-1
+  AWS_REGION: ${{ vars.AWS_REGION }}
   PYTHON_VERSION: "3.12"
-  LAMBDA_FUNCTION_NAME: resume-api
+  LAMBDA_FUNCTION_NAME: ${{ vars.LAMBDA_FUNCTION_NAME }}
 
 jobs:
   test:
@@ -45,7 +45,7 @@ jobs:
       - name: Run linting
         run: |
           pip install ruff
-          ruff check src/
+          ruff check app/
 
   build:
     name: Build Package
@@ -64,7 +64,7 @@ jobs:
         run: |
           mkdir -p package
           pip install -r requirements.txt -t package --quiet
-          cp -r src/* package/
+          cp -r app/* package/
           cd package
           zip -r ../lambda_package.zip . -x "*.pyc" -x "__pycache__/*" -x "*.dist-info/*" -x "*.egg-info/*"
           cd ..
@@ -115,10 +115,8 @@ jobs:
 
       - name: Smoke test
         run: |
+          # Give the Lambda a few seconds to initialize
           sleep 5
-          API_URL=$(aws lambda get-function-url-config \
-            --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
-            --query 'FunctionUrl' --output text 2>/dev/null || echo "")
-          if [ -n "$API_URL" ]; then
-            curl -sf "${API_URL}/api/health" || echo "Smoke test skipped"
-          fi
+          # Use the API Gateway URL from your GitHub Variables
+          # Note: Ensure you have added API_GATEWAY_URL to your GitHub Repo Variables
+          curl -sf "${{ vars.API_GATEWAY_URL }}/health" || echo "Smoke test skipped (API_GATEWAY_URL var may be missing)"
